@@ -75,7 +75,7 @@ class rotor_combined_controller():
 
 		self.f = open('real_traj.txt', 'w')
 	def data_process_link(self,Msg):
-		self.pos_mea[0,0]  = -Msg.pose.pose.position.y + 1
+		self.pos_mea[0,0]  = -Msg.pose.pose.position.y + 1  #-Msg.pose.pose.position.y + 0.4
 		self.pos_mea[1,0]  = Msg.pose.pose.position.x + 0.5
 		self.f.write(str(self.pos_mea[0,0]) + ',' + str(self.pos_mea[1,0]))
 		self.f.write('\n')
