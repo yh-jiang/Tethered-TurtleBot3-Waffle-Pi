@@ -17,10 +17,14 @@ This repository consists of the code for "Gathering Scattered Objects with Tethe
 
 ### Gazebo Simulation
 Open a terminal, and run:
-`roscore`
+```
+roscore
+```
 
 Open another terminal, and run:
-`roslaunch turtlebot3_gazebo turtlebot3_real_world.launch`
+```
+roslaunch turtlebot3_gazebo turtlebot3_real_world.launch
+```
 
 After the Gazebo window is opened, open another 2 terminals and run **"turtle_adaptive_one.py"** and **"traj.py"** sequentially.
 
@@ -29,15 +33,23 @@ After the Gazebo window is opened, open another 2 terminals and run **"turtle_ad
 Before continuing, make sure your laptop or PC and the SBC on TurtleBot3 are connected to the same WiFi. Configure their **ROS_MASTER_URI** and **ROS_HOSTNAME** properly.
 
 On your laptop or PC, open a terminal, and run:
-`roscore`
+```
+roscore
+```
 
 Open another terminal, ssh to the corresponding SBC, and run:
-`roslaunch turtlebot3_bringup turtlebot3_robot.launch`
+```
+roslaunch turtlebot3_bringup turtlebot3_robot.launch
+```
 
 Open another terminal, ssh to the corresponding SBC, and run:
-`./turtle_adaptive_one.py`
+```
+./turtle_adaptive_one.py
+```
 
 Open another terminal, ssh to the corresponding SBC, and run:
-`./traj.py`
+```
+./traj.py
+```
 
 After each experiment, put the TurtleBot3 to anywhere you want as the starting point, and press any arrow button on the remote controller for a while to reset the robot.
