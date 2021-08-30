@@ -13,8 +13,8 @@ import sys, select, termios, tty
 class trajectory_planning():
 	def __init__(self):
 		self.Traj    = np.loadtxt("traj_opt.txt", dtype='f', delimiter=',')
-		self.x_old   = self.Traj[0,2]
-		self.y_old   = self.Traj[0,3]
+		self.x_old   = self.Traj[0,2] #self.Traj[0,1]
+		self.y_old   = self.Traj[0,3] #self.Traj[0,2]
 		self.rate	 = rospy.get_param('~rate', 45.0)
 		self.step_num=0
 		self.traj_pos=Twist()
@@ -29,8 +29,8 @@ class trajectory_planning():
 		self.start_signal = Float64()
 	def traj(self):	
 		A=self.Traj[self.step_num,:]
-		self.traj_pos.linear.x=A[2] #x
-		self.traj_pos.linear.y=A[3]   #y
+		self.traj_pos.linear.x=A[2] # A[0]
+		self.traj_pos.linear.y=A[3] # A[1]
 		self.traj_pos.linear.z=0.0
 		self.traj_pos.angular.x=(self.traj_pos.linear.x-self.x_old)*self.rate
 		self.traj_pos.angular.y=(self.traj_pos.linear.y-self.y_old)*self.rate
