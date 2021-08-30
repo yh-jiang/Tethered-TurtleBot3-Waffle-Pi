@@ -5,7 +5,7 @@ This repository consists of the code for "Gathering Scattered Objects with Tethe
 
 ### Gazebo Simulation
 
-`turtlebot3_gazebo/` includes the necessary files for running simulation in Gazebo. **"tethered_turtle.urdf.xacro"** and **"tethered_turtle.gazebo.xacro"** in `urdf/` define the model of the tethered TurtleBots. **"real.world"** in `worlds` defines the world environment. **"turtlebot_motor.launch"** in `launch/` and **"torque_controller.yaml"** in `config/` define the controllers. **"turtlebot3_real_world.launch"** in `launch/` helps to launch the Gazebo simulation. **"traj.py"** and **"turtle_adaptive_one.py"** in `src/` are two python files that control the motors.
+`turtlebot3_gazebo/` includes the necessary files for running simulation in Gazebo. **"tethered_turtle.urdf.xacro"** and **"tethered_turtle.gazebo.xacro"** in `urdf/` define the model of the tethered TurtleBots. **"real.world"** in `worlds/` defines the world environment. **"turtlebot_motor.launch"** in `launch/` and **"torque_controller.yaml"** in `config/` define the controllers. **"turtlebot3_real_world.launch"** in `launch/` helps to launch the Gazebo simulation. **"traj.py"** and **"turtle_adaptive_one.py"** in `src/` are two python files that control the motors.
 
 ### Real-world Experiment
 
