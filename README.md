@@ -2,7 +2,7 @@
 This repository consists of the code for "Gathering Scattered Objects with Tethered Robot Duo"
 
 ## Code Description
-`turtlebot3_torque` includes the firmware that needs to be uploaded to OpenCR 1.0 on Turtlebot3 Waffle Pi. Check out the files in `turtlebot3_torque/examples/turtlebot3_torque_waffle/turtlebot3_torque_core/`, as well as **"turtlebot3_torque_motor_driver.h"** in `turtlebot3_torque/include/turtlebot3_torque` and **"turtlebot3_torque_motor_driver.cpp"** in `turtlebot3_torque/src/turtlebot3_torque`.
+`turtlebot3_torque` includes the firmware that needs to be uploaded to OpenCR 1.0 on Turtlebot3 Waffle Pi. Check out the files in `turtlebot3_torque/examples/turtlebot3_torque_waffle/turtlebot3_torque_core/`, as well as **"turtlebot3_torque_motor_driver.h"** in `turtlebot3_torque/include/turtlebot3_torque` and **"turtlebot3_torque_motor_driver.cpp"** in `turtlebot3_torque/src/turtlebot3_torque`. Note that we command the torque of each wheel of Turtlebot3 by writing the current instead of commanding the velocity of Turtlebot3.
 
 
 
