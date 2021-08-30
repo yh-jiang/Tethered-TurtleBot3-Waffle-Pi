@@ -1,0 +1,412 @@
+<?xml version="1.0"?>
+<robot name="tethered_turtle_sim" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:arg name="laser_visual"  default="false"/>
+  <xacro:arg name="camera_visual" default="false"/>
+  <xacro:arg name="imu_visual"    default="false"/>
+
+  <gazebo>
+      <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+         <robotNamespace>/tethered_turtle_sim</robotNamespace>
+      </plugin>   
+  </gazebo>
+
+  <!-- Turtle1 -->
+  <gazebo reference="turtle1/base_link">
+    <material>Gazebo/DarkGrey</material>
+  </gazebo>
+
+  <gazebo reference="turtle1/wheel_left_link">
+    <mu1>0.8</mu1>
+    <mu2>0.8</mu2>
+    <kp>10000000.0</kp>
+    <kd>10.0</kd>
+    <minDepth>0.001</minDepth>
+    <maxVel>0.1</maxVel>
+    <fdir1>1 0 0</fdir1>
+    <material>Gazebo/FlatBlack</material>
+  </gazebo>
+
+  <gazebo reference="turtle1/wheel_right_link">
+    <mu1>0.8</mu1>
+    <mu2>0.8</mu2>
+    <kp>10000000.0</kp>
+    <kd>10.0</kd>
+    <minDepth>0.001</minDepth>
+    <maxVel>0.1</maxVel>
+    <fdir1>1 0 0</fdir1>
+    <material>Gazebo/FlatBlack</material>
+  </gazebo>
+
+  <gazebo reference="turtle1/caster_back_right_link">
+    <mu1>0.1</mu1>
+    <mu2>0.1</mu2>
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+    <minDepth>0.001</minDepth>
+    <maxVel>1.0</maxVel>
+    <material>Gazebo/FlatBlack</material>
+  </gazebo>
+
+  <gazebo reference="turtle1/caster_back_left_link">
+    <mu1>0.1</mu1>
+    <mu2>0.1</mu2>
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+    <minDepth>0.001</minDepth>
+    <maxVel>1.0</maxVel>
+    <material>Gazebo/FlatBlack</material>
+  </gazebo>
+
+  <gazebo reference="turtle1/imu_link">
+    <sensor type="imu" name="turtle1_imu">
+      <always_on>true</always_on>
+      <visualize>$(arg imu_visual)</visualize>
+    </sensor>
+    <material>Gazebo/Grey</material>
+  </gazebo>
+
+<!--
+  <gazebo>
+      <plugin name="turtle1_turtlebot3_waffle_pi_controller" filename="libgazebo_ros_diff_drive.so">
+      <commandTopic>turtle1/cmd_vel</commandTopic>
+      <odometryTopic>turtle1/odom</odometryTopic>
+      <odometryFrame>turtle1/odom</odometryFrame>
+      <odometrySource>world</odometrySource>
+      <publishOdomTF>true</publishOdomTF>
+      <robotBaseFrame>turtle1/base_footprint</robotBaseFrame>
+      <publishWheelTF>false</publishWheelTF>
+      <publishTf>true</publishTf>
+      <publishWheelJointState>true</publishWheelJointState>
+      <legacyMode>false</legacyMode>
+      <updateRate>30</updateRate>
+      <leftJoint>turtle1/wheel_left_joint</leftJoint>
+      <rightJoint>turtle1/wheel_right_joint</rightJoint>
+      <wheelSeparation>0.287</wheelSeparation>
+      <wheelDiameter>0.066</wheelDiameter>
+      <wheelAcceleration>1</wheelAcceleration>
+      <wheelTorque>10</wheelTorque>
+      <rosDebugLevel>na</rosDebugLevel>
+    </plugin>
+  </gazebo>
+-->
+  <gazebo>
+    <plugin filename="librotors_gazebo_odometry_plugin.so" name="turtle1/odometry_sensor1">
+      <linkName>turtle1/imu_link</linkName>
+      <robotNamespace>/turtle1</robotNamespace>
+      <poseTopic>odometry_sensor1/pose</poseTopic>
+      <poseWithCovarianceTopic>odometry_sensor1/pose_with_covariance</poseWithCovarianceTopic>
+      <positionTopic>odometry_sensor1/position</positionTopic>
+      <transformTopic>odometry_sensor1/transform</transformTopic>
+      <odometryTopic>odometry_sensor1/odometry</odometryTopic>
+      <parentFrameId>world</parentFrameId>
+      <!-- Use the scoped link name here. e.g. Model::link. -->
+      <childFrameId>turtle1/imu_link</childFrameId>
+      <measurementDivisor>1</measurementDivisor>
+      <!-- only every (seq % measurementDivisor) == 0 measurement is published [int] -->
+      <measurementDelay>0</measurementDelay>
+      <!-- time that measurement gets held back before it's published in [simulation cycles (int)] -->
+      <unknownDelay>0.0</unknownDelay>
+      <!-- additional delay, that just gets added to the timestamp [s] -->
+      <noiseNormalPosition>0 0 0</noiseNormalPosition>
+      <!-- standard deviation of additive white gaussian noise [m] -->
+      <noiseNormalQuaternion>0 0 0</noiseNormalQuaternion>
+      <!-- standard deviation white gaussian noise [rad]: q_m = q*quaternionFromSmallAngleApproximation(noiseNormalQ) -->
+      <noiseNormalLinearVelocity>0 0 0</noiseNormalLinearVelocity>
+      <!-- standard deviation of additive white gaussian noise [m/s] -->
+      <noiseNormalAngularVelocity>0 0 0</noiseNormalAngularVelocity>
+      <!-- standard deviation of additive white gaussian noise [rad/s] -->
+      <noiseUniformPosition>0 0 0</noiseUniformPosition>
+      <!-- symmetric bounds of uniform noise [m] -->
+      <noiseUniformQuaternion>0 0 0</noiseUniformQuaternion>
+      <!-- symmetric bounds of uniform noise [rad], computation see above -->
+      <noiseUniformLinearVelocity>0 0 0</noiseUniformLinearVelocity>
+      <!-- symmetric bounds of uniform noise [m/s] -->
+      <noiseUniformAngularVelocity>0 0 0</noiseUniformAngularVelocity>
+    </plugin>
+  </gazebo>
+
+
+  <gazebo>
+    <plugin name="turtle1_imu_plugin" filename="libgazebo_ros_imu.so">
+      <alwaysOn>true</alwaysOn>
+      <bodyName>turtle1/imu_link</bodyName>
+      <frameName>turtle1/imu_link</frameName>
+      <topicName>turtle1/imu</topicName>
+      <serviceName>turtle1/imu_service</serviceName>
+      <gaussianNoise>0.0</gaussianNoise>
+      <updateRate>0</updateRate>
+      <imu>
+        <noise>
+          <type>gaussian</type>
+          <rate>
+            <mean>0.0</mean>
+            <stddev>2e-4</stddev>
+            <bias_mean>0.0000075</bias_mean>
+            <bias_stddev>0.0000008</bias_stddev>
+          </rate>
+          <accel>
+            <mean>0.0</mean>
+            <stddev>1.7e-2</stddev>
+            <bias_mean>0.1</bias_mean>
+            <bias_stddev>0.001</bias_stddev>
+          </accel>
+        </noise>
+      </imu>
+    </plugin>
+  </gazebo>
+
+  <gazebo reference="turtle1/base_scan">
+    <material>Gazebo/FlatBlack</material>
+    <sensor type="ray" name="turtle1_lds_lfcd_sensor">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>$(arg laser_visual)</visualize>
+      <update_rate>5</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>360</samples>
+            <resolution>1</resolution>
+            <min_angle>0.0</min_angle>
+            <max_angle>6.28319</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.120</min>
+          <max>3.5</max>
+          <resolution>0.015</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="turtle1_gazebo_ros_lds_lfcd_controller" filename="libgazebo_ros_laser.so">
+	<topicName>turtle1/scan</topicName>
+	<frameName>turtle1/base_scan</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+<!--link : https://www.raspberrypi.org/documentation/hardware/camera/-->
+  <gazebo reference="turtle1/camera_rgb_frame">
+      <sensor type="camera" name="turtle1_Pi Camera">
+      <always_on>true</always_on>
+      <visualize>$(arg camera_visual)</visualize>
+      <camera>
+          <horizontal_fov>1.085595</horizontal_fov>
+          <image>
+              <width>640</width>
+              <height>480</height>
+              <format>R8G8B8</format>
+          </image>
+          <clip>
+              <near>0.03</near>
+              <far>100</far>
+          </clip>
+      </camera>
+      <plugin name="turtle1_camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>30.0</updateRate>
+	      <cameraName>turtle1/camera</cameraName>
+	      <frameName>turtle1/camera_rgb_optical_frame</frameName>
+        <imageTopicName>rgb/image_raw</imageTopicName>
+        <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
+        <hackBaseline>0.07</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+
+<!-- Turtle2 -->
+  <gazebo reference="turtle2/base_link">
+    <material>Gazebo/DarkGrey</material>
+  </gazebo>
+
+  <gazebo reference="turtle2/wheel_left_link">
+    <mu1>0.8</mu1>
+    <mu2>0.8</mu2>
+    <kp>10000000.0</kp>
+    <kd>10.0</kd>
+    <minDepth>0.001</minDepth>
+    <maxVel>0.1</maxVel>
+    <fdir1>1 0 0</fdir1>
+    <material>Gazebo/FlatBlack</material>
+  </gazebo>
+
+  <gazebo reference="turtle2/wheel_right_link">
+    <mu1>0.8</mu1>
+    <mu2>0.8</mu2>
+    <kp>10000000.0</kp>
+    <kd>10.0</kd>
+    <minDepth>0.001</minDepth>
+    <maxVel>0.1</maxVel>
+    <fdir1>1 0 0</fdir1>
+    <material>Gazebo/FlatBlack</material>
+  </gazebo>
+
+  <gazebo reference="turtle2/caster_back_right_link">
+    <mu1>0.1</mu1>
+    <mu2>0.1</mu2>
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+    <minDepth>0.001</minDepth>
+    <maxVel>1.0</maxVel>
+    <material>Gazebo/FlatBlack</material>
+  </gazebo>
+
+  <gazebo reference="turtle2/caster_back_left_link">
+    <mu1>0.1</mu1>
+    <mu2>0.1</mu2>
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+    <minDepth>0.001</minDepth>
+    <maxVel>1.0</maxVel>
+    <material>Gazebo/FlatBlack</material>
+  </gazebo>
+
+  <gazebo reference="turtle2/imu_link">
+    <sensor type="imu" name="turtle2_imu">
+      <always_on>true</always_on>
+      <visualize>$(arg imu_visual)</visualize>
+    </sensor>
+    <material>Gazebo/Grey</material>
+  </gazebo>
+
+  <gazebo>
+    <plugin filename="librotors_gazebo_odometry_plugin.so" name="turtle2/odometry_sensor1">
+      <linkName>turtle2/imu_link</linkName>
+      <robotNamespace>/turtle2</robotNamespace>
+      <poseTopic>odometry_sensor1/pose</poseTopic>
+      <poseWithCovarianceTopic>odometry_sensor1/pose_with_covariance</poseWithCovarianceTopic>
+      <positionTopic>odometry_sensor1/position</positionTopic>
+      <transformTopic>odometry_sensor1/transform</transformTopic>
+      <odometryTopic>odometry_sensor1/odometry</odometryTopic>
+      <parentFrameId>world</parentFrameId>
+      <!-- Use the scoped link name here. e.g. Model::link. -->
+      <childFrameId>turtle2/imu_link</childFrameId>
+      <measurementDivisor>1</measurementDivisor>
+      <!-- only every (seq % measurementDivisor) == 0 measurement is published [int] -->
+      <measurementDelay>0</measurementDelay>
+      <!-- time that measurement gets held back before it's published in [simulation cycles (int)] -->
+      <unknownDelay>0.0</unknownDelay>
+      <!-- additional delay, that just gets added to the timestamp [s] -->
+      <noiseNormalPosition>0 0 0</noiseNormalPosition>
+      <!-- standard deviation of additive white gaussian noise [m] -->
+      <noiseNormalQuaternion>0 0 0</noiseNormalQuaternion>
+      <!-- standard deviation white gaussian noise [rad]: q_m = q*quaternionFromSmallAngleApproximation(noiseNormalQ) -->
+      <noiseNormalLinearVelocity>0 0 0</noiseNormalLinearVelocity>
+      <!-- standard deviation of additive white gaussian noise [m/s] -->
+      <noiseNormalAngularVelocity>0 0 0</noiseNormalAngularVelocity>
+      <!-- standard deviation of additive white gaussian noise [rad/s] -->
+      <noiseUniformPosition>0 0 0</noiseUniformPosition>
+      <!-- symmetric bounds of uniform noise [m] -->
+      <noiseUniformQuaternion>0 0 0</noiseUniformQuaternion>
+      <!-- symmetric bounds of uniform noise [rad], computation see above -->
+      <noiseUniformLinearVelocity>0 0 0</noiseUniformLinearVelocity>
+      <!-- symmetric bounds of uniform noise [m/s] -->
+      <noiseUniformAngularVelocity>0 0 0</noiseUniformAngularVelocity>
+    </plugin>
+  </gazebo>
+
+  <gazebo>
+    <plugin name="turtle2_imu_plugin" filename="libgazebo_ros_imu.so">
+      <alwaysOn>true</alwaysOn>
+      <bodyName>turtle2/imu_link</bodyName>
+      <frameName>turtle2/imu_link</frameName>
+      <topicName>turtle2/imu</topicName>
+      <serviceName>turtle2/imu_service</serviceName>
+      <gaussianNoise>0.0</gaussianNoise>
+      <updateRate>0</updateRate>
+      <imu>
+        <noise>
+          <type>gaussian</type>
+          <rate>
+            <mean>0.0</mean>
+            <stddev>2e-4</stddev>
+            <bias_mean>0.0000075</bias_mean>
+            <bias_stddev>0.0000008</bias_stddev>
+          </rate>
+          <accel>
+            <mean>0.0</mean>
+            <stddev>1.7e-2</stddev>
+            <bias_mean>0.1</bias_mean>
+            <bias_stddev>0.001</bias_stddev>
+          </accel>
+        </noise>
+      </imu>
+    </plugin>
+  </gazebo>
+
+  <gazebo reference="turtle2/base_scan">
+    <material>Gazebo/FlatBlack</material>
+    <sensor type="ray" name="turtle2_lds_lfcd_sensor">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>$(arg laser_visual)</visualize>
+      <update_rate>5</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>360</samples>
+            <resolution>1</resolution>
+            <min_angle>0.0</min_angle>
+            <max_angle>6.28319</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.120</min>
+          <max>3.5</max>
+          <resolution>0.015</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="turtle2_gazebo_ros_lds_lfcd_controller" filename="libgazebo_ros_laser.so">
+	      <topicName>turtle2/scan</topicName>
+	      <frameName>turtle2/base_scan</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="turtle2/camera_rgb_frame">
+      <sensor type="camera" name="turtle2_Pi Camera">
+      <always_on>true</always_on>
+      <visualize>$(arg camera_visual)</visualize>
+      <camera>
+          <horizontal_fov>1.085595</horizontal_fov>
+          <image>
+              <width>640</width>
+              <height>480</height>
+              <format>R8G8B8</format>
+          </image>
+          <clip>
+              <near>0.03</near>
+              <far>100</far>
+          </clip>
+      </camera>
+      <plugin name="turtle2_camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>30.0</updateRate>
+	      <cameraName>turtle2/camera</cameraName>
+	      <frameName>turtle2/camera_rgb_optical_frame</frameName>
+        <imageTopicName>rgb/image_raw</imageTopicName>
+        <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
+        <hackBaseline>0.07</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+</robot>

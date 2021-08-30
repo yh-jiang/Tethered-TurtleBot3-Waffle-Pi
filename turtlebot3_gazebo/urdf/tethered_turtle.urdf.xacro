@@ -1,0 +1,725 @@
+<?xml version="1.0"?>
+<robot name="tethered_turtle" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:include filename="$(find turtlebot3_description)/urdf/common_properties.xacro"/>
+  <xacro:include filename="$(find turtlebot3_gazebo)/urdf/tethered_turtle.gazebo.xacro"/>
+  <xacro:property name="stick_mass" value="0.0005"/> <!-- mass of the stick-->
+  <xacro:property name="stick_depth" value="0.01"/>
+  <xacro:property name="stick_width" value="0.1"/>
+  <xacro:property name="stick_height" value="0.08"/>
+  <xacro:property name="rotation_limit" value="3.1415926"/>
+  <xacro:property name="effort_limit" value="30"/>
+  <xacro:property name="velocity_limit" value="3.1415926"/>
+  <xacro:property name="stick_damping" value="0.00001"/>
+  <xacro:property name="safety_offset" value="0.005"/>
+  <xacro:property name="theta_1" value="-2.306898"/>
+  <xacro:property name="theta_2" value="0.4613795775735"/>
+
+  <xacro:macro name="stick2stick" params="name_1 name_2 rotation_angle">
+    <joint name="${name_1}_${name_2}" type="revolute">
+      <parent link="${name_1}"/>
+      <child link="${name_2}"/>
+      <origin xyz="0 ${-(stick_width + safety_offset)} 0" rpy="0 0 ${rotation_angle}"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="${-1.0 * rotation_limit}" upper="${rotation_limit}" effort="${effort_limit}" velocity="${velocity_limit}"/>
+      <dynamics damping="${stick_damping}"/>
+    </joint>
+
+    <link name="${name_2}">
+      <visual>
+        <geometry>
+	        <box size="${stick_depth} ${stick_width} ${stick_height}"/>
+        </geometry>
+        <origin xyz="0 ${-(stick_width / 2.0)} 0" rpy="0 0 0"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 ${-(stick_width / 2.0)} 0" rpy="0 0 0"/>
+        <geometry>
+	        <box size="${stick_depth} ${stick_width} ${stick_height}"/>
+        </geometry>
+      </collision>
+
+      <inertial>
+        <origin xyz="0 ${-(stick_width / 2.0)} 0" rpy="0 0 0"/>
+        <mass value="${stick_mass}"/>
+        <inertia
+	        ixx="${stick_mass / 12.0 * (stick_width*stick_width + stick_height*stick_height)}" ixy="0.0" ixz="0.0"
+          iyy="${stick_mass / 12.0 * (stick_depth*stick_depth + stick_height*stick_height)}" iyz="0.0"
+	        izz="${stick_mass / 12.0 * (stick_width*stick_width + stick_depth*stick_depth)}"/>
+      </inertial>
+    </link>
+  </xacro:macro>
+
+<!-- Turtle1 -->
+  <link name="turtle1/base_footprint"/>
+
+  <joint name="turtle1/base_joint" type="fixed">
+    <parent link="turtle1/base_footprint"/>
+    <child link="turtle1/base_link" />
+    <origin xyz="0 0 0.010" rpy="0 0 0"/>
+  </joint>
+
+  <link name="turtle1/base_link">
+    <visual>
+      <origin xyz="-0.064 0 0.0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://turtlebot3_description/meshes/bases/waffle_pi_base.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="light_black"/>
+    </visual>
+
+    <collision>
+      <origin xyz="-0.064 0 0.047" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.266 0.266 0.094"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <origin xyz="-0.02 0 0" rpy="0 0 0"/>
+      <mass value="1.3729096e+00"/>
+      <inertia ixx="8.7002718e-03" ixy="-4.7576583e-05" ixz="1.1160499e-04"
+               iyy="8.6195418e-03" iyz="-3.5422299e-06"
+               izz="1.4612727e-02" />
+    </inertial>
+  </link>
+
+
+  <joint name="turtle1/wheel_left_joint" type="continuous">
+    <parent link="turtle1/base_link"/>
+    <child link="turtle1/wheel_left_link"/>
+    <origin xyz="0.0 0.144 0.023" rpy="-1.57 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <transmission name="turtle1/wheel_left_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="turtle1/wheel_left_joint">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="turtle1/wheel_left_joint_motor">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <link name="turtle1/wheel_left_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57 0 0"/>
+      <geometry>
+        <mesh filename="package://turtlebot3_description/meshes/wheels/left_tire.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.018" radius="0.033"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="2.8498940e-02" />
+      <inertia ixx="1.1175580e-05" ixy="-4.2369783e-11" ixz="-5.9381719e-09"
+               iyy="1.1192413e-05" iyz="-1.4400107e-11"
+               izz="2.0712558e-05" />
+      </inertial>
+  </link>
+
+  <joint name="turtle1/wheel_right_joint" type="continuous">
+    <parent link="turtle1/base_link"/>
+    <child link="turtle1/wheel_right_link"/>
+    <origin xyz="0.0 -0.144 0.023" rpy="-1.57 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <transmission name="turtle1/wheel_right_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="turtle1/wheel_right_joint">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="turtle1/wheel_right_joint_motor">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <link name="turtle1/wheel_right_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57 0 0"/>
+      <geometry>
+        <mesh filename="package://turtlebot3_description/meshes/wheels/right_tire.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.018" radius="0.033"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="2.8498940e-02" />
+      <inertia ixx="1.1175580e-05" ixy="-4.2369783e-11" ixz="-5.9381719e-09"
+               iyy="1.1192413e-05" iyz="-1.4400107e-11"
+               izz="2.0712558e-05" />
+      </inertial>
+  </link>
+
+  <joint name="turtle1/caster_back_right_joint" type="fixed">
+    <parent link="turtle1/base_link"/>
+    <child link="turtle1/caster_back_right_link"/>
+    <origin xyz="-0.177 -0.064 -0.004" rpy="-1.57 0 0"/>
+  </joint>
+
+  <link name="turtle1/caster_back_right_link">
+    <collision>
+      <origin xyz="0 0.001 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.030 0.009 0.020"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="0.005" />
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+               iyy="0.001" iyz="0.0"
+               izz="0.001" />
+    </inertial>
+  </link>
+
+  <joint name="turtle1/caster_back_left_joint" type="fixed">
+    <parent link="turtle1/base_link"/>
+    <child link="turtle1/caster_back_left_link"/>
+    <origin xyz="-0.177 0.064 -0.004" rpy="-1.57 0 0"/>
+  </joint>
+
+  <link name="turtle1/caster_back_left_link">
+    <collision>
+      <origin xyz="0 0.001 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.030 0.009 0.020"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="0.005" />
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+               iyy="0.001" iyz="0.0"
+               izz="0.001" />
+    </inertial>
+  </link>
+
+  <joint name="turtle1/imu_joint" type="fixed">
+    <parent link="turtle1/base_link"/>
+    <child link="turtle1/imu_link"/>
+    <origin xyz="0.0 0 0.068" rpy="0 0 0"/>
+  </joint>
+
+  <link name="turtle1/imu_link"/>
+
+  <joint name="turtle1/scan_joint" type="fixed">
+    <parent link="turtle1/base_link"/>
+    <child link="turtle1/base_scan"/>
+    <origin xyz="-0.064 0 0.122" rpy="0 0 0"/>
+  </joint>
+
+  <link name="turtle1/base_scan">
+    <visual>
+      <origin xyz="0 0 0.0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://turtlebot3_description/meshes/sensors/lds.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0.015 0 -0.0065" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.0315" radius="0.055"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <mass value="0.114" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+               iyy="0.001" iyz="0.0"
+               izz="0.001" />
+    </inertial>
+  </link>
+
+  <joint name="turtle1/camera_joint" type="fixed">
+    <origin xyz="0.073 -0.011 0.084" rpy="0 0 0"/>
+    <parent link="turtle1/base_link"/>
+    <child link="turtle1/camera_link"/>
+  </joint>
+
+  <link name="turtle1/camera_link">
+    <collision>
+      <origin xyz="0.005 0.011 0.013" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.015 0.030 0.027"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="turtle1/camera_rgb_joint" type="fixed">
+    <origin xyz="0.003 0.011 0.009" rpy="0 0 0"/>
+    <parent link="turtle1/camera_link"/>
+    <child link="turtle1/camera_rgb_frame"/>
+  </joint>
+  <link name="turtle1/camera_rgb_frame"/>
+
+  <joint name="turtle1/camera_rgb_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="-1.57 0 -1.57"/>
+    <parent link="turtle1/camera_rgb_frame"/>
+    <child link="turtle1/camera_rgb_optical_frame"/>
+  </joint>
+  <link name="turtle1/camera_rgb_optical_frame"/>
+
+
+  <!--Sticks in between-->
+<!--
+  <joint name="turtle1_stick1" type="fixed">
+    <parent link="turtle1/base_footprint"/>
+    <child link="stick1"/>
+    <origin xyz="${-0.064 - 0.133 - safety_offset - stick_depth/2.0} 0 0.057" rpy="0 0 0"/>
+  </joint>
+-->
+  <joint name="turtle1_stick1" type="revolute">
+    <parent link="turtle1/base_footprint"/>
+    <child link="stick1"/>
+    <origin xyz="${-0.064 - 0.133 - safety_offset - stick_depth/2.0} 0 0.057" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="0" upper="0" effort="${effort_limit}" velocity="${velocity_limit}"/>
+    <dynamics damping="${stick_damping}"/>
+  </joint>
+
+  <link name="stick1">
+    <visual>
+      <geometry>
+	      <box size="${stick_depth} 0.133 ${stick_height}"/>
+      </geometry>
+      <origin xyz="0 -0.0665 0" rpy="0 0 0"/>
+    </visual>
+    <collision>
+      <origin xyz="0 -0.0665 0" rpy="0 0 0"/>
+      <geometry>
+	      <box size="${stick_depth} 0.133 ${stick_height}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 -0.0665 0" rpy="0 0 0"/>
+      <mass value="${stick_mass}"/>
+      <inertia
+	        ixx="${stick_mass / 12.0 * (stick_width*stick_width + stick_height*stick_height)}" ixy="0.0" ixz="0.0"
+          iyy="${stick_mass / 12.0 * (stick_depth*stick_depth + stick_height*stick_height)}" iyz="0.0"
+	        izz="${stick_mass / 12.0 * (stick_width*stick_width + stick_depth*stick_depth)}"/>
+    </inertial>
+  </link>
+
+  <joint name="stick1_stick2" type="revolute">
+    <parent link="stick1"/>
+    <child link="stick2"/>
+    <!--<origin xyz="0 ${-(0.133 + safety_offset)} 0" rpy="0 0 ${theta_1}"/>-->
+    <origin xyz="0 ${-(0.133 + safety_offset)} 0" rpy="0 0 ${theta_1}"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-1.0*rotation_limit}" upper="${rotation_limit}" effort="${effort_limit}" velocity="${velocity_limit}"/>
+    <dynamics damping="${stick_damping}"/>
+  </joint>
+
+
+  <link name="stick2">
+    <visual>
+      <geometry>
+	      <box size="${stick_depth} ${stick_width} ${stick_height}"/>
+      </geometry>
+      <origin xyz="0 ${-(stick_width / 2.0)} 0" rpy="0 0 0"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0 ${-(stick_width / 2.0)} 0" rpy="0 0 0"/>
+      <geometry>
+	      <box size="${stick_depth} ${stick_width} ${stick_height}"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <origin xyz="0 ${-(stick_width / 2.0)} 0" rpy="0 0 0"/>
+      <mass value="${stick_mass}"/>
+      <inertia
+	      ixx="${stick_mass / 12.0 * (stick_width*stick_width + stick_height*stick_height)}" ixy="0.0" ixz="0.0"
+        iyy="${stick_mass / 12.0 * (stick_depth*stick_depth + stick_height*stick_height)}" iyz="0.0"
+	      izz="${stick_mass / 12.0 * (stick_width*stick_width + stick_depth*stick_depth)}"/>
+    </inertial>
+  </link>
+
+
+  
+
+  <xacro:stick2stick name_1="stick2" name_2="stick3" rotation_angle="${theta_2}"/>
+  <xacro:stick2stick name_1="stick3" name_2="stick4" rotation_angle="${theta_2}"/>
+  <xacro:stick2stick name_1="stick4" name_2="stick5" rotation_angle="${theta_2}"/>
+  <xacro:stick2stick name_1="stick5" name_2="stick6" rotation_angle="${theta_2}"/>
+  <xacro:stick2stick name_1="stick6" name_2="stick7" rotation_angle="${theta_2}"/>
+  <xacro:stick2stick name_1="stick7" name_2="stick8" rotation_angle="0"/>
+  <xacro:stick2stick name_1="stick8" name_2="stick9" rotation_angle="${theta_2}"/>
+  <xacro:stick2stick name_1="stick9" name_2="stick10" rotation_angle="${theta_2}"/>
+  <xacro:stick2stick name_1="stick10" name_2="stick11" rotation_angle="${theta_2}"/>
+  <xacro:stick2stick name_1="stick11" name_2="stick12" rotation_angle="${theta_2}"/>
+  <xacro:stick2stick name_1="stick12" name_2="stick13" rotation_angle="${theta_2}"/>
+  
+  <joint name="stick13_stick14" type="revolute">
+    <parent link="stick13"/>
+    <child link="stick14"/>
+    <!--<origin xyz="0 ${-(stick_width + safety_offset)} 0" rpy = "0 0 ${theta_1}"/>-->
+    <origin xyz="0 ${-(stick_width + safety_offset)} 0" rpy="0 0 ${theta_1}"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-1.0 * rotation_limit}" upper="${rotation_limit}" effort="${effort_limit}" velocity="${velocity_limit}"/>
+    <dynamics damping="${stick_damping}"/>
+  </joint>
+
+  <link name="stick14">
+    <visual>
+      <geometry>
+	      <box size="${stick_depth} 0.133 ${stick_height}"/>
+      </geometry>
+      <origin xyz="0 -0.0665 0" rpy="0 0 0"/>
+    </visual>
+    <collision>
+      <origin xyz="0 -0.0665 0" rpy="0 0 0"/>
+      <geometry>
+	      <box size="${stick_depth} 0.133 ${stick_height}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 -0.0665 0" rpy="0 0 0"/>
+      <mass value="${stick_mass}"/>
+      <inertia
+	        ixx="${stick_mass / 12.0 * (stick_width*stick_width + stick_height*stick_height)}" ixy="0.0" ixz="0.0"
+          iyy="${stick_mass / 12.0 * (stick_depth*stick_depth + stick_height*stick_height)}" iyz="0.0"
+	        izz="${stick_mass / 12.0 * (stick_width*stick_width + stick_depth*stick_depth)}"/>
+    </inertial>
+  </link>
+
+  <joint name="stick14_turtle2" type="revolute">
+    <parent link="stick14"/>
+    <child link="turtle2/base_footprint"/>
+    <origin xyz="${0.064 + 0.133 + safety_offset + stick_depth/2.0} ${-(0.133 + safety_offset)} -0.057"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="0" upper="0" effort="${effort_limit}" velocity="${velocity_limit}"/>
+    <dynamics damping="${stick_damping}"/>
+  </joint>
+<!--
+  <joint name="stick14_turtle2" type="fixed">
+    <parent link="stick14"/>
+    <child link="turtle2/base_footprint"/>
+    <origin xyz="${0.064 + 0.133 + safety_offset + stick_depth/2.0} ${-(0.133 + safety_offset)} -0.057"/>
+  </joint>
+-->
+
+
+
+
+
+<!--Turtle2-->
+  <link name="turtle2/base_footprint"/>
+
+  <joint name="turtle2/base_joint" type="fixed">
+    <parent link="turtle2/base_footprint"/>
+    <child link="turtle2/base_link" />
+    <origin xyz="0 0 0.010" rpy="0 0 0"/>
+  </joint>
+
+  <link name="turtle2/base_link">
+    <visual>
+      <origin xyz="-0.064 0 0.0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://turtlebot3_description/meshes/bases/waffle_pi_base.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="light_black"/>
+    </visual>
+
+    <collision>
+      <origin xyz="-0.064 0 0.047" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.266 0.266 0.094"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <origin xyz="-0.02 0 0" rpy="0 0 0"/>
+      <mass value="1.3729096e+00"/>
+      <inertia ixx="8.7002718e-03" ixy="-4.7576583e-05" ixz="1.1160499e-04"
+               iyy="8.6195418e-03" iyz="-3.5422299e-06"
+               izz="1.4612727e-02" />
+    </inertial>
+  </link>
+
+  <joint name="turtle2/wheel_left_joint" type="continuous">
+    <parent link="turtle2/base_link"/>
+    <child link="turtle2/wheel_left_link"/>
+    <origin xyz="0.0 0.144 0.023" rpy="-1.57 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <transmission name="turtle2/wheel_left_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="turtle2/wheel_left_joint">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="turtle2/wheel_left_joint_motor">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <link name="turtle2/wheel_left_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57 0 0"/>
+      <geometry>
+        <mesh filename="package://turtlebot3_description/meshes/wheels/left_tire.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.018" radius="0.033"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="2.8498940e-02" />
+      <inertia ixx="1.1175580e-05" ixy="-4.2369783e-11" ixz="-5.9381719e-09"
+               iyy="1.1192413e-05" iyz="-1.4400107e-11"
+               izz="2.0712558e-05" />
+      </inertial>
+  </link>
+
+  <joint name="turtle2/wheel_right_joint" type="continuous">
+    <parent link="turtle2/base_link"/>
+    <child link="turtle2/wheel_right_link"/>
+    <origin xyz="0.0 -0.144 0.023" rpy="-1.57 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <transmission name="turtle2/wheel_right_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="turtle2/wheel_right_joint">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="turtle2/wheel_right_joint_motor">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <link name="turtle2/wheel_right_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57 0 0"/>
+      <geometry>
+        <mesh filename="package://turtlebot3_description/meshes/wheels/right_tire.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.018" radius="0.033"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="2.8498940e-02" />
+      <inertia ixx="1.1175580e-05" ixy="-4.2369783e-11" ixz="-5.9381719e-09"
+               iyy="1.1192413e-05" iyz="-1.4400107e-11"
+               izz="2.0712558e-05" />
+      </inertial>
+  </link>
+
+  <joint name="turtle2/caster_back_right_joint" type="fixed">
+    <parent link="turtle2/base_link"/>
+    <child link="turtle2/caster_back_right_link"/>
+    <origin xyz="-0.177 -0.064 -0.004" rpy="-1.57 0 0"/>
+  </joint>
+
+  <link name="turtle2/caster_back_right_link">
+    <collision>
+      <origin xyz="0 0.001 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.030 0.009 0.020"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="0.005" />
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+               iyy="0.001" iyz="0.0"
+               izz="0.001" />
+    </inertial>
+  </link>
+
+  <joint name="turtle2/caster_back_left_joint" type="fixed">
+    <parent link="turtle2/base_link"/>
+    <child link="turtle2/caster_back_left_link"/>
+    <origin xyz="-0.177 0.064 -0.004" rpy="-1.57 0 0"/>
+  </joint>
+
+  <link name="turtle2/caster_back_left_link">
+    <collision>
+      <origin xyz="0 0.001 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.030 0.009 0.020"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="0.005" />
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+               iyy="0.001" iyz="0.0"
+               izz="0.001" />
+    </inertial>
+  </link>
+
+  <joint name="turtle2/imu_joint" type="fixed">
+    <parent link="turtle2/base_link"/>
+    <child link="turtle2/imu_link"/>
+    <origin xyz="0.0 0 0.068" rpy="0 0 0"/>
+  </joint>
+
+  <link name="turtle2/imu_link"/>
+
+  <joint name="turtle2/scan_joint" type="fixed">
+    <parent link="turtle2/base_link"/>
+    <child link="turtle2/base_scan"/>
+    <origin xyz="-0.064 0 0.122" rpy="0 0 0"/>
+  </joint>
+
+  <link name="turtle2/base_scan">
+    <visual>
+      <origin xyz="0 0 0.0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://turtlebot3_description/meshes/sensors/lds.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0.015 0 -0.0065" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.0315" radius="0.055"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <mass value="0.114" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+               iyy="0.001" iyz="0.0"
+               izz="0.001" />
+    </inertial>
+  </link>
+
+  <joint name="turtle2/camera_joint" type="fixed">
+    <origin xyz="0.073 -0.011 0.084" rpy="0 0 0"/>
+    <parent link="turtle2/base_link"/>
+    <child link="turtle2/camera_link"/>
+  </joint>
+
+  <link name="turtle2/camera_link">
+    <collision>
+      <origin xyz="0.005 0.011 0.013" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.015 0.030 0.027"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="turtle2/camera_rgb_joint" type="fixed">
+    <origin xyz="0.003 0.011 0.009" rpy="0 0 0"/>
+    <parent link="turtle2/camera_link"/>
+    <child link="turtle2/camera_rgb_frame"/>
+  </joint>
+  <link name="turtle2/camera_rgb_frame"/>
+
+  <joint name="turtle2/camera_rgb_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="-1.57 0 -1.57"/>
+    <parent link="turtle2/camera_rgb_frame"/>
+    <child link="turtle2/camera_rgb_optical_frame"/>
+  </joint>
+  <link name="turtle2/camera_rgb_optical_frame"/>
+
+
+
+  <gazebo reference="stick1">
+    <material>Gazebo/White</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+  <gazebo reference="stick2">
+    <material>Gazebo/Grey</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+  <gazebo reference="stick3">
+    <material>Gazebo/White</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+  <gazebo reference="stick4">
+    <material>Gazebo/Grey</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+  <gazebo reference="stick5">
+    <material>Gazebo/White</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+  <gazebo reference="stick6">
+    <material>Gazebo/Grey</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+  <gazebo reference="stick7">
+    <material>Gazebo/White</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+  <gazebo reference="stick8">
+    <material>Gazebo/Grey</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+  <gazebo reference="stick9">
+    <material>Gazebo/White</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+  <gazebo reference="stick10">
+    <material>Gazebo/Grey</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+  <gazebo reference="stick11">
+    <material>Gazebo/White</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+  <gazebo reference="stick12">
+    <material>Gazebo/Grey</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+  <gazebo reference="stick13">
+    <material>Gazebo/White</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+  <gazebo reference="stick14">
+    <material>Gazebo/Grey</material>
+    <selfCollide>true</selfCollide>
+  </gazebo>
+</robot>
