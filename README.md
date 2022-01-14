@@ -1,5 +1,5 @@
 # Tethered-TurtleBot3-Waffle-Pi
-This repository consists of the code for "Gathering Scattered Objects with Tethered Robot Duo".
+This repository consists of the code for "Object Gathering with a Tethered Robot Duo".
 
 ## Code Description
 
